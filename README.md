@@ -11,20 +11,23 @@ To use this:
 
 ### Create a Copy of `golangci-lint` that Can Run with Plugins
 
-In order to use plugins, you'll need a golangci-lint executable that can run them. The normal version of this project 
-is built with the vendors option, which breaks plugins that have overlapping dependencies.
+In order to use plugins, you'll need a golangci-lint executable that can run them. Plugin dependencies defined in the 
+`go.mod` file MUST have a matching version (or hash) as the same dependency in th `golangci-lint` binary if the 
+dependency is used in both. Because of the high probability of this both using the same dependency, it is recommended 
+to use a locally built binary. To do so:
 
 1. Download [golangci-lint](https://github.com/golangci/golangci-lint) source code
-2. From the projects root directory, run `make vendor_free_build`
+2. From the projects root directory, run `make`
 3. Copy the `golangci-lint` executable that was created to your path, project, or other location
 
 ### Configure Your Project for Linting
 
-If you already have a linter plugin available, you can follow these steps to define it's usage in a projects 
-`.golangci.yml` file. An example linter can be found at [here](https://github.com/golangci/example-plugin-linter). If you're looking for 
-instructions on how to configure your own custom linter, they can be found further down.
+If you already have a linter plugin available, you can follow these steps to define its usage in a projects 
+`.golangci.yml` file. If you're looking for instructions on how to configure your own custom linter, they can be found 
+further down.
 
-1. If the project you want to lint does not have one already, copy the [.golangci.yml](https://github.com/golangci/golangci-lint/blob/master/.golangci.yml) to the root directory.
+1. If the project you want to lint does not have one already, copy the [.golangci.yml](https://github.com/golangci/golangci-lint/blob/master/.golangci.yml) 
+  to the root directory.
 2. Adjust the yaml to appropriate `linters-settings:custom` entries as so:
 ```
 linters-settings:
