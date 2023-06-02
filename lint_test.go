@@ -3,11 +3,11 @@ package linters
 // Tests for linters.
 
 import (
-	"github.com/stretchr/testify/suite"
 	"path/filepath"
 	"runtime"
 	"testing"
 
+	"github.com/stretchr/testify/suite"
 	"golang.org/x/tools/go/analysis/analysistest"
 )
 
@@ -16,8 +16,7 @@ type linterSuite struct {
 }
 
 func (suite *linterSuite) TestContextLinter() {
-	analysistest.Run(
-		suite.T(), TestdataDir(),
+	analysistest.Run(suite.T(), TestdataDir(),
 		TodoAnalyzer, "testlintdata/todo")
 }
 
@@ -30,5 +29,6 @@ func TestdataDir() string {
 	if !ok {
 		panic("unable to get current test filename")
 	}
+
 	return filepath.Join(filepath.Dir(testFilename), "testdata")
 }

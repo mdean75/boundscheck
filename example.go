@@ -2,8 +2,9 @@ package linters
 
 import (
 	"go/ast"
-	"golang.org/x/tools/go/analysis"
 	"strings"
+
+	"golang.org/x/tools/go/analysis"
 )
 
 var TodoAnalyzer = &analysis.Analyzer{
@@ -16,8 +17,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	for _, file := range pass.Files {
 		ast.Inspect(file, func(n ast.Node) bool {
 			if comment, ok := n.(*ast.Comment); ok {
-				if strings.HasPrefix(comment.Text, "// TODO:") ||
-					strings.HasPrefix(comment.Text, "// TODO():") {
+				if strings.HasPrefix(comment.Text, "// TODO:") || strings.HasPrefix(comment.Text, "// TODO():") {
 					pass.Report(analysis.Diagnostic{
 						Pos:            comment.Pos(),
 						End:            0,
@@ -27,8 +27,10 @@ func run(pass *analysis.Pass) (interface{}, error) {
 					})
 				}
 			}
+
 			return true
 		})
 	}
+
 	return nil, nil
 }
