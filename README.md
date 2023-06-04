@@ -28,13 +28,19 @@ If you're looking for instructions on how to configure your own custom linter, t
 
 1. If the project you want to lint does not have one already, copy the [.golangci.yml](https://github.com/golangci/golangci-lint/blob/master/.golangci.yml) to the root directory.
 2. Adjust the YAML to appropriate `linters-settings.custom` entries as so:
-    ```yml
+    ```yaml
     linters-settings:
-     custom:
-      example:
-       path: /example.so
-       description: The description of the linter
-       original-url: github.com/golangci/example-linter
+      custom:
+        example:
+          path: /example.so
+          description: The description of the linter
+          original-url: github.com/golangci/example-linter
+          settings: # Settings are optional.
+            one: Foo
+            two:
+              - name: Bar
+            three:
+              name: Bar
     ```
 
 That is all the configuration that is required to run a custom linter in your project.
@@ -42,34 +48,37 @@ That is all the configuration that is required to run a custom linter in your pr
 Custom linters are enabled by default, but abide by the same rules as other linters.
 
 If the disable all option is specified either on command line or in `.golang.yml` files `linters.disable-all: true`, custom linters will be disabled;
-they can be re-enabled by adding them to the `linters:enable` list,
+they can be re-enabled by adding them to the `linters.enable` list,
 or providing the enabled option on the command line, `golangci-lint run -Eexample`.
 
-### To Create Your Own Custom Linter
+The configuration inside the `settings` field of linter have some limitations (there are NOT related to the plugin system itself):
+we use Viper to handle the configuration but Viper put all the keys in lowercase, and `.` cannot be used inside a key.
 
-Your linter must implement one or more `golang.org/x/tools/go/analysis.Analyzer` structs.
+### To Create Your Own Plugin
+
+Your linter must provide one or more `golang.org/x/tools/go/analysis.Analyzer` structs.
 
 Your project should also use `go.mod`.
 
 All versions of libraries that overlap `golangci-lint` (including replaced libraries) MUST be set to the same version as `golangci-lint`.
 You can see the versions by running `go version -m golangci-lint`.
 
-You'll also need to create a go file like `plugin/example.go`.
+You'll also need to create a Go file like `plugin/example.go`.
 
-This MUST be in the package `main`, and define a variable of name `AnalyzerPlugin`.
-The `AnalyzerPlugin` instance MUST implement the following interface:
-
+This file MUST be in the package `main`, and MUST define an exposed function called `New` with the following signature:
 ```go
-type AnalyzerPlugin interface {
-    GetAnalyzers() []*analysis.Analyzer
+func New(conf any) ([]*analysis.Analyzer, error) {
+	// ...
 }
 ```
 
-The type of `AnalyzerPlugin` is not important, but is by convention `type analyzerPlugin struct {}`.
-See [plugin/example.go](https://github.com/golangci/example-plugin-linter/plugin/example.go) for more info.
+See [plugin/example.go](https://github.com/golangci/example-plugin-linter/blob/master/plugin/example.go) for more info.
 
-To build the plugin, from the root project directory, run `go build -buildmode=plugin plugin/example.go`.
+To build the plugin, from the root project directory, run:
+```bash
+go build -buildmode=plugin plugin/example.go
+```
 
-This will create a plugin `*.so` file that can be copied into your project or another well known location for usage in golangci-lint.
+This will create a plugin `*.so` file that can be copied into your project or another well known location for usage in `golangci-lint`.
 
 [^1]: Alternately, you can use the `-o /path/to/location/example.so` output flag to have it put it there for you.
