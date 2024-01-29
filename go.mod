@@ -1,4 +1,4 @@
-module github.com/golangci/example-linter
+module github.com/mdean75/boundscheck
 
 // All versions here need to be the same as in golangci-lint/mod.go if present
 
